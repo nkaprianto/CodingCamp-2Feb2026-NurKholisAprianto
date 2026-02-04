@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Engineer To-Do List</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <h1>Todo List</h1>
+        
+        <form id="todo-form" class="input-section">
+            <input type="text" id="task-input" placeholder="Add a todo..." required>
+            <input type="date" id="date-input" required>
+            <button type="submit" id="add-btn">+</button>
+        </form>
+
+        <div class="action-bar">
+            <select id="filter-select">
+                <option value="all">FILTER (All)</option>
+                <option value="completed">Completed</option>
+                <option value="pending">Pending</option>
+            </select>
+            <button id="delete-all-btn">DELETE ALL</button>
+        </div>
+
+        <table class="todo-table">
+            <thead>
+                <tr>
+                    <th>TASK</th>
+                    <th>DUE DATE</th>
+                    <th>STATUS</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody id="todo-list">
+                </tbody>
+        </table>
+        <p id="empty-msg" class="hidden">No task found</p>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
