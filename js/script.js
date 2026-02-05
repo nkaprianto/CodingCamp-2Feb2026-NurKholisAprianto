@@ -10,13 +10,11 @@ const emptyMsg = document.getElementById('empty-msg');
 const today = new Date().toISOString().split('T')[0];
 dateInput.setAttribute('min', today);
 
-// 2. LOCAL STORAGE: Ambil data lama jika ada, jika tidak mulai dengan array kosong
+// 2. LOCAL STORAGE: Ambil data lama
 let todos = JSON.parse(localStorage.getItem('myTodos')) || [];
 
-// Render pertama kali saat halaman dibuka
 renderTodos();
 
-// Form Validation and Add Task
 todoForm.addEventListener('submit', (e) => {
     e.preventDefault();
     if (taskInput.value.trim() === "" || dateInput.value === "") {
@@ -32,11 +30,10 @@ todoForm.addEventListener('submit', (e) => {
     };
 
     todos.push(newTodo);
-    saveAndRender(); // Simpan dan tampilkan
+    saveAndRender();
     todoForm.reset();
 });
 
-// Fungsi pembantu untuk Simpan ke LocalStorage dan Update UI
 function saveAndRender() {
     localStorage.setItem('myTodos', JSON.stringify(todos));
     renderTodos(filterSelect.value);
@@ -59,17 +56,57 @@ function renderTodos(filter = 'all') {
 
     filtered.forEach(todo => {
         const tr = document.createElement('tr');
+        // Menambahkan data-id agar baris mudah ditemukan saat mode edit
+        tr.setAttribute('data-id', todo.id); 
+        
         tr.innerHTML = `
             <td class="${todo.completed ? 'completed' : ''}">${todo.task}</td>
             <td>${todo.date}</td>
-            <td><button class="status-btn" onclick="toggleStatus(${todo.id})">${todo.completed ? 'Done' : 'Pending'}</button></td>
-            <td><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteTodo(${todo.id})">Delete</button></td>
+            <td>
+                <button class="status-btn" onclick="toggleStatus(${todo.id})">
+                    ${todo.completed ? 'Done' : 'Pending'}
+                </button>
+            </td>
+            <td>
+                <button style="color:var(--primary-pastel, #7d85f5); background:none; border:none; cursor:pointer; margin-right:10px;" onclick="editTodo(${todo.id})">Edit</button>
+                <button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteTodo(${todo.id})">Delete</button>
+            </td>
         `;
         todoList.appendChild(tr);
     });
 }
 
-// Actions
+// --- ACTIONS ---
+
+// Fungsi untuk masuk ke mode Edit
+window.editTodo = (id) => {
+    const todo = todos.find(t => t.id === id);
+    const tr = document.querySelector(`tr[data-id="${id}"]`);
+    
+    if (todo && tr) {
+        tr.innerHTML = `
+            <td><input type="text" id="edit-task-${id}" value="${todo.task}" class="edit-input"></td>
+            <td><input type="date" id="edit-date-${id}" value="${todo.date}" class="edit-input" min="${today}"></td>
+            <td><button class="status-btn" onclick="saveEdit(${id})">Save</button></td>
+            <td><button style="color:gray; background:none; border:none; cursor:pointer;" onclick="renderTodos()">Cancel</button></td>
+        `;
+    }
+};
+
+// Fungsi untuk menyimpan hasil edit
+window.saveEdit = (id) => {
+    const newTask = document.getElementById(`edit-task-${id}`).value;
+    const newDate = document.getElementById(`edit-date-${id}`).value;
+
+    if (newTask.trim() === "" || newDate === "") {
+        alert("Fields cannot be empty!");
+        return;
+    }
+
+    todos = todos.map(t => t.id === id ? { ...t, task: newTask, date: newDate } : t);
+    saveAndRender();
+};
+
 window.toggleStatus = (id) => {
     todos = todos.map(t => t.id === id ? {...t, completed: !t.completed} : t);
     saveAndRender();
