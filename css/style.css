@@ -14,11 +14,12 @@ body {
     color: var(--text-color);
     font-family: 'Quicksand', sans-serif;
     display: flex;
-    justify-content: center;
-    min-height: 100vh;
+    flex-direction: column; 
+    align-items: center;
+    min-height: 100vh; /* Tinggi minimal adalah setinggi layar browser */
     margin: 0;
-    padding: 50px 20px;
-    overflow-x: hidden; /* Mencegah scroll horizontal saat animasi toast */
+    padding: 50px 20px 0 20px; /* PENTING: Nilai ketiga (bawah) harus 0 */
+    box-sizing: border-box;
 }
 
 /* 2. KONTAINER UTAMA */
@@ -87,7 +88,9 @@ input:focus {
 .action-bar {
     display: flex;
     justify-content: space-between;
+    align-items: center; /* Menjaga filter dan tombol sejajar secara vertikal */
     margin-bottom: 25px;
+    gap: 12px; /* Memberikan jarak default antar elemen di dalamnya */
 }
 
 .todo-table {
@@ -151,10 +154,12 @@ td:last-child {
     background: none;
     border: 2px solid #ffccd5;
     color: #ffafcc;
-    padding: 8px 16px;
-    border-radius: 12px;
+    padding: 10px 20px; /* Menambah padding agar ukurannya lebih proporsional */
+    border-radius: 15px; /* Menyamakan lengkungan dengan tombol + */
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s ease;
+    height: fit-content; /* Memastikan tinggi mengikuti isi */
 }
 
 #delete-all-btn:hover {
@@ -202,19 +207,21 @@ td:last-child {
     to { opacity: 0; transform: translateY(-20px); }
 }
 
-/* --- FOOTER STYLE --- */
+/* Dorong footer ke posisi paling bawah */
 .main-footer {
+    margin-top: auto; /* Mendorong footer ke dasar layar */
+    width: 100%;
     text-align: center;
-    margin-top: 40px; /* Jarak dari app-container */
-    padding-bottom: 20px;
-    color: #a3b1c6; /* Warna abu-abu pastel agar tidak terlalu kontras */
+    padding: 25px 0; /* Memberi ruang di dalam footer, bukan di luar */
+    color: #a3b1c6;
     font-size: 0.9rem;
     font-weight: 500;
+    background: transparent; /* Pastikan tidak ada warna latar yang memotong */
 }
 
 .main-footer p {
-    margin: 0;
-    letter-spacing: 0.5px;
+    margin: 0; /* PENTING: Menghapus margin bawaan teks agar tidak mendorong footer ke atas */
+    padding: 0;
 }
 
 .hidden {
