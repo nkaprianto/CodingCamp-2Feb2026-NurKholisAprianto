@@ -202,6 +202,21 @@ td:last-child {
     to { opacity: 0; transform: translateY(-20px); }
 }
 
+/* --- FOOTER STYLE --- */
+.main-footer {
+    text-align: center;
+    margin-top: 40px; /* Jarak dari app-container */
+    padding-bottom: 20px;
+    color: #a3b1c6; /* Warna abu-abu pastel agar tidak terlalu kontras */
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.main-footer p {
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
 .hidden {
     display: none;
 }
