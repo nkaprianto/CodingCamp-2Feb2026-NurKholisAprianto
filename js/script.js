@@ -5,20 +5,36 @@ const todoList = document.getElementById('todo-list');
 const filterSelect = document.getElementById('filter-select');
 const deleteAllBtn = document.getElementById('delete-all-btn');
 const emptyMsg = document.getElementById('empty-msg');
+const toastContainer = document.getElementById('toast-container');
 
-// 1. VALIDASI TANGGAL: Cegah pilih tanggal masa lalu
+// 1. Validasi Tanggal
 const today = new Date().toISOString().split('T')[0];
 dateInput.setAttribute('min', today);
 
-// 2. LOCAL STORAGE: Ambil data lama
+// 2. Local Storage
 let todos = JSON.parse(localStorage.getItem('myTodos')) || [];
 
 renderTodos();
 
+// --- FUNGSI CUSTOM TOAST (ALERT MENARIK) ---
+function showToast(message, icon = "✅") {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<span>${icon}</span> ${message}`;
+    
+    toastContainer.appendChild(toast);
+
+    // Hapus elemen dari DOM setelah animasi selesai (3 detik)
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Form Submit
 todoForm.addEventListener('submit', (e) => {
     e.preventDefault();
     if (taskInput.value.trim() === "" || dateInput.value === "") {
-        alert("Please fill in both fields!");
+        showToast("Mohon isi semua bidang!", "⚠️");
         return;
     }
 
@@ -32,6 +48,7 @@ todoForm.addEventListener('submit', (e) => {
     todos.push(newTodo);
     saveAndRender();
     todoForm.reset();
+    showToast("Tugas berhasil ditambahkan!");
 });
 
 function saveAndRender() {
@@ -39,7 +56,6 @@ function saveAndRender() {
     renderTodos(filterSelect.value);
 }
 
-// Render List
 function renderTodos(filter = 'all') {
     todoList.innerHTML = '';
     const filtered = todos.filter(t => {
@@ -56,33 +72,24 @@ function renderTodos(filter = 'all') {
 
     filtered.forEach(todo => {
         const tr = document.createElement('tr');
-        // Menambahkan data-id agar baris mudah ditemukan saat mode edit
         tr.setAttribute('data-id', todo.id); 
-        
         tr.innerHTML = `
             <td class="${todo.completed ? 'completed' : ''}">${todo.task}</td>
             <td>${todo.date}</td>
+            <td><button class="status-btn" onclick="toggleStatus(${todo.id})">${todo.completed ? 'Done' : 'Pending'}</button></td>
             <td>
-                <button class="status-btn" onclick="toggleStatus(${todo.id})">
-                    ${todo.completed ? 'Done' : 'Pending'}
-                </button>
-            </td>
-            <td>
-                <button style="color:var(--primary-pastel, #7d85f5); background:none; border:none; cursor:pointer; margin-right:10px;" onclick="editTodo(${todo.id})">Edit</button>
-                <button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteTodo(${todo.id})">Delete</button>
+                <button style="color:#a2d2ff; background:none; border:none; cursor:pointer; margin-right:10px;" onclick="editTodo(${todo.id})">Edit</button>
+                <button style="color:#ffafcc; background:none; border:none; cursor:pointer;" onclick="deleteTodo(${todo.id})">Delete</button>
             </td>
         `;
         todoList.appendChild(tr);
     });
 }
 
-// --- ACTIONS ---
-
-// Fungsi untuk masuk ke mode Edit
+// Actions
 window.editTodo = (id) => {
     const todo = todos.find(t => t.id === id);
     const tr = document.querySelector(`tr[data-id="${id}"]`);
-    
     if (todo && tr) {
         tr.innerHTML = `
             <td><input type="text" id="edit-task-${id}" value="${todo.task}" class="edit-input"></td>
@@ -93,18 +100,18 @@ window.editTodo = (id) => {
     }
 };
 
-// Fungsi untuk menyimpan hasil edit
 window.saveEdit = (id) => {
     const newTask = document.getElementById(`edit-task-${id}`).value;
     const newDate = document.getElementById(`edit-date-${id}`).value;
 
     if (newTask.trim() === "" || newDate === "") {
-        alert("Fields cannot be empty!");
+        showToast("Data tidak boleh kosong!", "❌");
         return;
     }
 
     todos = todos.map(t => t.id === id ? { ...t, task: newTask, date: newDate } : t);
     saveAndRender();
+    showToast("Tugas berhasil diperbarui! 📝");
 };
 
 window.toggleStatus = (id) => {
@@ -113,14 +120,18 @@ window.toggleStatus = (id) => {
 };
 
 window.deleteTodo = (id) => {
-    todos = todos.filter(t => t.id !== id);
-    saveAndRender();
+    if(confirm("Hapus tugas ini?")) {
+        todos = todos.filter(t => t.id !== id);
+        saveAndRender();
+        showToast("Tugas telah dihapus!", "🗑️");
+    }
 };
 
 deleteAllBtn.addEventListener('click', () => {
-    if(confirm("Clear all tasks?")) {
+    if(confirm("Hapus semua tugas?")) {
         todos = [];
         saveAndRender();
+        showToast("Semua tugas dibersihkan!", "🧹");
     }
 });
 
